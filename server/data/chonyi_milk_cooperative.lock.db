@@ -1,0 +1,6 @@
+#FileLock
+#Wed Jun 18 22:58:40 EAT 2025
+server=192.168.1.150\:50665
+hostName=192.168.1.150
+method=file
+id=197849f388fc3a5322a3ed7a6d00d0283993a85e93d

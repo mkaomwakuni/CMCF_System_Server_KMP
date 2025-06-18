@@ -1,7 +1,6 @@
 # CMFC System Server
-
-**CMFC System Server** - A comprehensive dairy cooperative management
-system built with Kotlin and Ktor framework.
+**CMFC System Server** - A comprehensive dairy cooperative management system built with Kotlin and
+Ktor framework.
 
 ## Overview
 
@@ -92,7 +91,6 @@ member management, inventory control, and financial reporting for dairy farming 
 - **Gradle with Kotlin DSL** - Build automation
 - **JUnit** - Unit testing framework
 - **Kotlinx Coroutines** - Asynchronous programming
-- **Logback** - Comprehensive logging system
 
 ### Deployment & Infrastructure
 
@@ -154,7 +152,6 @@ member management, inventory control, and financial reporting for dairy farming 
 - **Build Tool**: Gradle with Kotlin DSL
 - **JVM Target**: Kotlin 1.9.0
 - **Development Mode**: Hot reload support
-- **Logging**: Comprehensive request/response logging
 
 ## Security Features
 
@@ -170,21 +167,6 @@ member management, inventory control, and financial reporting for dairy farming 
 - **Input Validation**: Comprehensive request validation
 - **Error Handling**: Secure error responses without sensitive data exposure
 - **Access Logging**: Complete audit trail for all operations
-
-## Monitoring & Logging
-
-### Comprehensive Logging
-
-- **Request/Response Logging**: Complete HTTP transaction logs
-- **Database Operations**: SQL query logging and performance monitoring
-- **Authentication Events**: Login attempts and security events
-- **Error Tracking**: Detailed error logging with stack traces
-
-### Performance Monitoring
-
-- **Real-time Metrics**: Production, sales, and inventory statistics
-- **Health Checks**: System status and database connectivity
-- **Stock Calculations**: Automated inventory reconciliation
 
 ## Installation & Deployment
 
@@ -206,22 +188,11 @@ member management, inventory control, and financial reporting for dairy farming 
 - Configure PostgreSQL database connection
 - Update API keys and security settings
 - Set up proper logging and monitoring
-- Configure reverse proxy (nginx/Apache) if needed
-
-## API Documentation
-
-Complete API documentation with examples is available in `client_example.md`, covering:
-
-- Authentication workflows
-- User management operations
-- Milk production tracking
-- Financial reporting
-- Member and livestock management
 
 ## Contributing
 
-This system is designed for dairy cooperative management with extensible architecture supporting
-additional features like:
+This system is designed for dairy cooperative management with extensible architecture that may supporting
+additional features like these in future :
 
 - Mobile app integration
 - Advanced analytics and reporting

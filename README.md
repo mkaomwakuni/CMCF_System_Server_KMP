@@ -70,7 +70,6 @@ Once the server is running:
 ### Authentication
 - `POST /auth/signup` - User registration
 - `POST /auth/signin` - User login
-- `POST /auth/create-superuser` - Create system administrator
 
 ### Core Operations
 - `GET/POST/PUT/DELETE /cows` - Livestock management

@@ -1,6 +1,8 @@
 package cnc.coop.milkcreamies.plugins
 
 import cnc.coop.milkcreamies.data.DatabaseConfig
+import cnc.coop.milkcreamies.domain.models.ArchiveCowRequest
+import cnc.coop.milkcreamies.domain.models.ArchiveMemberRequest
 import cnc.coop.milkcreamies.domain.models.Cow
 import cnc.coop.milkcreamies.domain.models.Member
 import cnc.coop.milkcreamies.domain.models.MilkOutEntry
@@ -77,6 +79,8 @@ data class MilkSpoiltEntryRequest(
     val lossAmount: Double, // Monetary loss in KES
     val cause: SpoilageCause? = null // Reason for spoilage
 )
+
+// Removed duplicate ArchiveRequest definitions - using domain models instead
 
 private val logger = LoggerFactory.getLogger("Plugins")
 
@@ -410,6 +414,63 @@ fun Application.configureRouting() {
                         )
                     }
                 }
+
+                post("/{id}/archive") {
+                    try {
+                        val cowId = call.parameters["id"] ?: return@post call.respond(
+                            HttpStatusCode.BadRequest,
+                            mapOf("error" to "Missing cow ID")
+                        )
+                        logger.debug("POST /cows/$cowId/archive")
+                        if (!isValidCowId(cowId)) {
+                            logger.warn("Invalid cowId format: $cowId")
+                            return@post call.respond(
+                                HttpStatusCode.BadRequest,
+                                mapOf("error" to "Invalid cow ID format")
+                            )
+                        }
+
+                        // Try to receive request body, but provide defaults if not present
+                        val archiveRequest = try {
+                            call.receive<ArchiveCowRequest>()
+                        } catch (e: Exception) {
+                            // If no body or invalid body, create default archive request
+                            ArchiveCowRequest(
+                                cowId = cowId,
+                                reason = "Archived via API",
+                                archiveDate = LocalDate(2023, 1, 1) // Hardcoded date for now
+                            )
+                        }
+
+                        // Ensure the cowId matches
+                        val validatedRequest = if (archiveRequest.cowId != cowId) {
+                            archiveRequest.copy(cowId = cowId)
+                        } else {
+                            archiveRequest
+                        }
+
+                        val cow = cowRepository.getCowById(cowId)
+                        if (cow == null) {
+                            logger.info("Cow not found: $cowId")
+                            return@post call.respond(HttpStatusCode.NotFound, mapOf("error" to "Cow not found"))
+                        }
+
+                        val success = cowRepository.archiveCow(validatedRequest)
+                        if (success) {
+                            call.respond(HttpStatusCode.OK, mapOf("message" to "Cow archived successfully"))
+                        } else {
+                            logger.info("Failed to archive cow: $cowId")
+                            call.respond(HttpStatusCode.InternalServerError, mapOf("error" to "Failed to archive cow"))
+                        }
+                    } catch (e: Exception) {
+                        val cowId = call.parameters["id"] ?: "unknown"
+                        logger.error("Error in POST /cows/$cowId/archive: ${e.message}", e)
+                        call.respond(
+                            HttpStatusCode.InternalServerError,
+                            mapOf("error" to "Internal server error")
+                        )
+                    }
+                }
             }
 
             route("/members") {
@@ -479,6 +540,63 @@ fun Application.configureRouting() {
                         call.respond(HttpStatusCode.Created, newMember)
                     } catch (e: Exception) {
                         logger.error("Error in POST /members: ${e.message}", e)
+                        call.respond(
+                            HttpStatusCode.InternalServerError,
+                            mapOf("error" to "Internal server error")
+                        )
+                    }
+                }
+
+                post("/{id}/archive") {
+                    try {
+                        val memberId = call.parameters["id"] ?: return@post call.respond(
+                            HttpStatusCode.BadRequest,
+                            mapOf("error" to "Missing member ID")
+                        )
+                        logger.debug("POST /members/$memberId/archive")
+                        if (!isValidOwnerId(memberId)) {
+                            logger.warn("Invalid memberId format: $memberId")
+                            return@post call.respond(
+                                HttpStatusCode.BadRequest,
+                                mapOf("error" to "Invalid member ID format")
+                            )
+                        }
+
+                        // Try to receive request body, but provide defaults if not present
+                        val archiveRequest = try {
+                            call.receive<ArchiveMemberRequest>()
+                        } catch (e: Exception) {
+                            // If no body or invalid body, create default archive request
+                            ArchiveMemberRequest(
+                                memberId = memberId,
+                                reason = "Archived via API",
+                                archiveDate = LocalDate(2023, 1, 1) // Hardcoded date for now
+                            )
+                        }
+
+                        // Ensure the memberId matches
+                        val validatedRequest = if (archiveRequest.memberId != memberId) {
+                            archiveRequest.copy(memberId = memberId)
+                        } else {
+                            archiveRequest
+                        }
+
+                        val member = memberRepository.getMemberById(memberId)
+                        if (member == null) {
+                            logger.info("Member not found: $memberId")
+                            return@post call.respond(HttpStatusCode.NotFound, mapOf("error" to "Member not found"))
+                        }
+
+                        val success = memberRepository.archiveMember(validatedRequest)
+                        if (success) {
+                            call.respond(HttpStatusCode.OK, mapOf("message" to "Member archived successfully"))
+                        } else {
+                            logger.info("Failed to archive member: $memberId")
+                            call.respond(HttpStatusCode.InternalServerError, mapOf("error" to "Failed to archive member"))
+                        }
+                    } catch (e: Exception) {
+                        val memberId = call.parameters["id"] ?: "unknown"
+                        logger.error("Error in POST /members/$memberId/archive: ${e.message}", e)
                         call.respond(
                             HttpStatusCode.InternalServerError,
                             mapOf("error" to "Internal server error")

@@ -6,8 +6,11 @@ import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 
 fun main() {
-    embeddedServer(Netty, port = SERVER_PORT, host = "0.0.0.0") {
+    val port = System.getenv("PORT")?.toIntOrNull() ?: 8080
+
+    embeddedServer(Netty, port = port, host = "0.0.0.0") {
         DatabaseConfig.init()
         configurePlugins()
     }.start(wait = true)
 }
+
